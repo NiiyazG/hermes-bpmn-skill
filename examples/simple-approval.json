@@ -1,0 +1,212 @@
+{
+  "process": {
+    "id": "purchase-approval",
+    "name": "Согласование закупки",
+    "goal": "показывает путь заявки на закупку от инициирования до утверждения или возврата на доработку",
+    "language": "ru"
+  },
+  "pools": [
+    {
+      "id": "company",
+      "name": "Компания",
+      "lanes": [
+        {
+          "id": "requester",
+          "name": "Инициатор"
+        },
+        {
+          "id": "manager",
+          "name": "Руководитель"
+        },
+        {
+          "id": "finance",
+          "name": "Финансы"
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "startEvent",
+      "name": "Возникла потребность",
+      "pool": "company",
+      "lane": "requester",
+      "x": 320,
+      "y": 255,
+      "width": 46,
+      "height": 46
+    },
+    {
+      "id": "create",
+      "type": "userTask",
+      "name": "Подготовить заявку на закупку",
+      "pool": "company",
+      "lane": "requester",
+      "x": 450,
+      "y": 235,
+      "width": 270,
+      "height": 82
+    },
+    {
+      "id": "mgr",
+      "type": "userTask",
+      "name": "Рассмотреть заявку",
+      "pool": "company",
+      "lane": "manager",
+      "x": 850,
+      "y": 475,
+      "width": 250,
+      "height": 82
+    },
+    {
+      "id": "g1",
+      "type": "exclusiveGateway",
+      "name": "Заявка согласована?",
+      "pool": "company",
+      "lane": "manager",
+      "x": 1190,
+      "y": 483,
+      "width": 66,
+      "height": 66
+    },
+    {
+      "id": "fin",
+      "type": "userTask",
+      "name": "Проверить бюджет",
+      "pool": "company",
+      "lane": "finance",
+      "x": 1380,
+      "y": 715,
+      "width": 250,
+      "height": 82
+    },
+    {
+      "id": "g2",
+      "type": "exclusiveGateway",
+      "name": "Бюджет подтвержден?",
+      "pool": "company",
+      "lane": "finance",
+      "x": 1720,
+      "y": 723,
+      "width": 66,
+      "height": 66
+    },
+    {
+      "id": "end",
+      "type": "endEvent",
+      "name": "Закупка согласована",
+      "pool": "company",
+      "lane": "finance",
+      "x": 1950,
+      "y": 732,
+      "width": 46,
+      "height": 46
+    }
+  ],
+  "flows": [
+    {
+      "id": "f1",
+      "type": "sequence",
+      "source": "start",
+      "target": "create"
+    },
+    {
+      "id": "f2",
+      "type": "sequence",
+      "source": "create",
+      "target": "mgr"
+    },
+    {
+      "id": "f3",
+      "type": "sequence",
+      "source": "mgr",
+      "target": "g1"
+    },
+    {
+      "id": "f4",
+      "type": "sequence",
+      "source": "g1",
+      "target": "fin",
+      "name": "Да"
+    },
+    {
+      "id": "f5",
+      "type": "sequence",
+      "source": "g1",
+      "target": "create",
+      "name": "Нет",
+      "waypoints": [
+        [
+          1223,
+          483
+        ],
+        [
+          1223,
+          190
+        ],
+        [
+          585,
+          190
+        ],
+        [
+          585,
+          235
+        ]
+      ]
+    },
+    {
+      "id": "f6",
+      "type": "sequence",
+      "source": "fin",
+      "target": "g2"
+    },
+    {
+      "id": "f7",
+      "type": "sequence",
+      "source": "g2",
+      "target": "end",
+      "name": "Да"
+    },
+    {
+      "id": "f8",
+      "type": "sequence",
+      "source": "g2",
+      "target": "create",
+      "name": "Нет",
+      "waypoints": [
+        [
+          1753,
+          723
+        ],
+        [
+          1753,
+          160
+        ],
+        [
+          620,
+          160
+        ],
+        [
+          620,
+          235
+        ]
+      ]
+    }
+  ],
+  "brief": {
+    "checkpoints": [
+      "согласование руководителем",
+      "проверка бюджета"
+    ],
+    "loops": [
+      "возврат заявки инициатору при отказе"
+    ]
+  },
+  "style": {
+    "lane_height": 240,
+    "margin_x": 120,
+    "margin_y": 160,
+    "label_width": 180
+  }
+}
